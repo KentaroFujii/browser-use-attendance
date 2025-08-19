@@ -1,0 +1,30 @@
+# LLMモデル設定ファイル
+# 使用するLLMプロバイダーとモデルの設定を管理
+
+models:
+  # OpenAI設定
+  openai:
+    enabled: true                    # このモデルを有効にするかどうか
+    model: "gpt-4o-mini"            # 使用するOpenAIモデル名（gpt-4、gpt-3.5-turbo等）
+    temperature: 0.7                 # モデルの創造性（0.0-2.0、低いほど一貫性重視）
+    api_key_env: "OPENAI_API_KEY"   # APIキーの環境変数名
+
+  # Anthropic Claude設定
+  anthropic:
+    enabled: false                           # 現在無効（trueにすると有効化）
+    model: "claude-3-sonnet-20240229"       # 使用するClaudeモデル名
+    temperature: 0.7                         # モデルの創造性
+    api_key_env: "ANTHROPIC_API_KEY"        # APIキーの環境変数名
+
+  # Google Gemini設定
+  google:
+    enabled: false                    # 現在無効（trueにすると有効化）
+    model: "gemini-pro"              # 使用するGeminiモデル名
+    temperature: 0.7                  # モデルの創造性
+    api_key_env: "GOOGLE_API_KEY"    # APIキーの環境変数名
+
+# 全体設定
+settings:
+  default_model: "openai"     # 最初に試すデフォルトモデル
+  fallback_enabled: true      # デフォルトモデルが使用できない場合に他のモデルを試すか
+  timeout: 300               # API応答のタイムアウト時間（秒）

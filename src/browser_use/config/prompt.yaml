@@ -1,0 +1,31 @@
+# プロンプトとメッセージ設定ファイル
+# AIエージェントのタスクとユーザー向けメッセージをカスタマイズ
+
+prompts:
+  # AIエージェントが実行するデフォルトタスク
+  default_task: "GitHubのトップページにアクセスして、検索ボックスに'browser-use'と入力してください"
+
+  # プログラム実行中に表示されるメッセージ
+  messages:
+    start: "Browser-use のテストを開始します"                    # プログラム開始時
+    agent_start: "エージェントを開始します"                      # AIエージェント開始時
+    task_description: "タスク: GitHubのトップページにアクセスして、検索ボックスに'browser-use'と入力する"  # タスク説明
+    task_complete: "タスクが完了しました"                        # タスク完了時
+    error_occurred: "エラーが発生しました"                       # エラー発生時
+
+  # エラー関連のメッセージ
+  errors:
+    no_api_key: "エラー: APIキーが設定されていません"                          # APIキー未設定エラー
+    env_setup_instruction: ".envファイルに以下のいずれかのAPIキーを設定してください"  # 設定方法の案内
+
+  # トラブルシューティング用のヒント
+  troubleshooting:
+    title: "ヒント"                                                      # ヒントセクションのタイトル
+    api_key_check: "APIキーが正しく設定されているか確認してください"              # APIキー確認
+    internet_check: "インターネット接続を確認してください"                    # ネット接続確認
+    browser_check: "Chromiumブラウザが正しくインストールされているか確認してください"  # ブラウザ確認
+
+# プログラムヘッダー表示設定
+headers:
+  program_title: "Browser-use テストプログラム"  # プログラムタイトル
+  separator_length: 60                        # 区切り線の長さ（=記号の数）

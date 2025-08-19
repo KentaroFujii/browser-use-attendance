@@ -5,17 +5,17 @@
 ```
 browser-use/
 ├── src/
-│   └── browser_use_test/
-│       ├── core/
-│       │   └── test_browser_use.py  # メインテストスクリプト
-│       └── config/
-│           ├── modes_setting.yaml   # LLMモデル設定
-│           └── prompt.yaml          # プロンプト設定
-├── pyproject.toml                   # 依存関係管理
-├── .env.example                    # 環境変数設定例
-├── .env                            # 環境変数設定（.env.exampleをコピーして作成）
+│   ├── main.py                     # メインエントリーポイント
+│   ├── core/
+│   │   └── browser_agent.py        # ブラウザエージェントクラス
+│   └── config/
+│       ├── modes_setting.yaml      # LLMモデル設定
+│       ├── prompt.yaml             # LLMプロンプト設定
+│       └── app_messages.yaml       # アプリケーションメッセージ設定
+├── pyproject.toml                  # 依存関係管理
+├── .env                           # 環境変数設定
 ├── .gitignore
-└── README.md                       # このファイル
+└── README.md                      # このファイル
 ```
 
 ## 環境構築
@@ -47,7 +47,7 @@ GOOGLE_API_KEY=your_google_api_key_here
 ### 勤怠管理システム確認の実行
 
 ```bash
-uv run src/browser_use/core/browser_use.py
+uv run src/main.py
 ```
 
 このコマンドで、環境変数で設定された勤怠管理システムにアクセスして勤怠情報を確認するタスクが実行されます。
@@ -77,6 +77,12 @@ LLMプロンプトの設定を管理します：
 - プログラム実行中のメッセージ
 - エラーメッセージとトラブルシューティング
 - プログラムヘッダー表示設定
+
+### core/browser_agent.py
+ブラウザエージェントのコアロジック：
+- LLM設定の読み込みと初期化
+- 環境変数を使った動的プロンプト生成
+- ブラウザエージェントの実行制御
 
 ## カスタマイズ
 設定ファイルを編集することで、コードを変更せずに以下をカスタマイズできます：

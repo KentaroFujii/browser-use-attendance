@@ -1,26 +1,19 @@
 """
-Browser-use のテストサンプルコード
-このスクリプトは、browser-use を使用してAIエージェントがブラウザを操作するデモです。
+勤怠管理システム自動確認用ブラウザエージェント
+YAML設定からLLMモデルとプロンプトを読み込み、エージェントを実行する
 """
-
-import asyncio
-from dotenv import load_dotenv
 import os
 import yaml
 from pathlib import Path
 from browser_use import Agent
-
-# 環境変数を読み込み
-load_dotenv()
-
 # LLMモデルのインポート
 from browser_use import ChatOpenAI
 from langchain_anthropic import ChatAnthropic
 from langchain_google_genai import ChatGoogleGenerativeAI
 
-class BrowserUseTest:
+class AttendanceAgent:
     """
-    Browser-use テストクラス
+    勤怠管理システム自動確認エージェント
     YAML設定からLLMモデルとプロンプトを読み込み、エージェントを実行する
     """
 
@@ -107,6 +100,9 @@ class BrowserUseTest:
         return False
 
     def show_api_key_error(self):
+        """
+        APIキーエラーメッセージを表示
+        """
         errors = self.messages_config.get('errors', {})
         print(errors.get('no_api_key', 'APIキーが設定されていません'))
         print(errors.get('env_setup_instruction', '設定を確認してください'))
@@ -118,6 +114,9 @@ class BrowserUseTest:
             print(f"   - {api_key_env}")
 
     def show_header(self):
+        """
+        プログラムヘッダーを表示
+        """
         if self.messages_config:
             headers = self.messages_config.get('headers', {})
             separator_length = headers.get('separator_length', 60)
@@ -157,6 +156,9 @@ class BrowserUseTest:
         return True
 
     async def run_agent(self):
+        """
+        ブラウザエージェントを実行
+        """
         messages = self.messages_config.get('messages', {})
         troubleshooting = self.messages_config.get('troubleshooting', {})
 
@@ -194,6 +196,9 @@ class BrowserUseTest:
             print(f"   - {troubleshooting.get('browser_check', 'ブラウザの確認をしてください')}")
 
     async def run(self):
+        """
+        エージェント実行のメインフロー
+        """
         # 設定ファイル読み込み
         if not self.load_configs():
             return
@@ -206,10 +211,3 @@ class BrowserUseTest:
 
         # エージェント実行
         await self.run_agent()
-
-def main():
-    test = BrowserUseTest()
-    asyncio.run(test.run())
-
-if __name__ == "__main__":
-    main()

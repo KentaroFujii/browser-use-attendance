@@ -56,6 +56,25 @@ wheels = [
 ]
 
 [[package]]
+name = "attendance-automation"
+version = "0.1.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "browser-use" },
+    { name = "langchain-anthropic" },
+    { name = "langchain-google-genai" },
+    { name = "pyyaml" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "browser-use", specifier = ">=0.5.11" },
+    { name = "langchain-anthropic", specifier = ">=0.3.0" },
+    { name = "langchain-google-genai", specifier = ">=2.0.0" },
+    { name = "pyyaml", specifier = ">=6.0.2" },
+]
+
+[[package]]
 name = "attrs"
 version = "25.3.0"
 source = { registry = "https://pypi.org/simple" }
@@ -138,25 +157,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/6a/f6/8248a594b9981d218f6af225a87da73afcac8684d135437f3afcf11adddb/browser_use-0.5.11.tar.gz", hash = "sha256:1461f02a6fa156de648b7c9ca3a1c71a2e488ef1c1df0c0d9c46003665911a22", size = 251811 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/8a/fa/a0b8253af9dea945db0b898a22f59c3f97f613835ed3af888d68d5a4a202/browser_use-0.5.11-py3-none-any.whl", hash = "sha256:69f64b22db407a60294639acc2d9ff8997162f575643eb953b19cf3b48eb9f5f", size = 310107 },
-]
-
-[[package]]
-name = "browser-use-test"
-version = "0.1.0"
-source = { virtual = "." }
-dependencies = [
-    { name = "browser-use" },
-    { name = "langchain-anthropic" },
-    { name = "langchain-google-genai" },
-    { name = "pyyaml" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "browser-use", specifier = ">=0.5.11" },
-    { name = "langchain-anthropic", specifier = ">=0.3.0" },
-    { name = "langchain-google-genai", specifier = ">=2.0.0" },
-    { name = "pyyaml", specifier = ">=6.0.2" },
 ]
 
 [[package]]

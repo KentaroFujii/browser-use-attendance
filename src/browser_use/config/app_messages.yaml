@@ -1,0 +1,37 @@
+# アプリケーションメッセージ設定ファイル
+# プログラム実行中に表示されるメッセージとエラー文を管理
+
+# プログラム実行中に表示されるメッセージ
+messages:
+  start: "Browser-use のテストを開始します"                    # プログラム開始時
+  agent_start: "エージェントを開始します"                      # AIエージェント開始時
+  task_description: "タスク: 指定されたURLにアクセスして勤怠情報を確認する"  # タスク説明
+  task_complete: "タスクが完了しました"                        # タスク完了時
+  error_occurred: "エラーが発生しました"                       # エラー発生時
+
+  # 勤怠管理システム関連メッセージ
+  site_access: "勤怠管理システムにアクセスしています"           # サイトアクセス時
+  login_process: "ログイン処理を実行中です"                   # ログイン処理中
+  attendance_check: "勤怠情報を確認しています"                # 勤怠情報確認中
+  attendance_complete: "勤怠情報の確認が完了しました"           # 勤怠確認完了
+
+# エラー関連のメッセージ
+errors:
+  no_api_key: "エラー: APIキーが設定されていません"                          # APIキー未設定エラー
+  no_target_url: "エラー: アクセス先URLが設定されていません"                 # アクセス先URL未設定エラー
+  env_setup_instruction: ".envファイルに以下の設定を行ってください"             # 設定方法の案内
+  target_url_instruction: "TARGET_URL=https://your-attendance-system.com/ (勤怠管理システムのURL)"  # アクセス先URL設定案内
+
+# トラブルシューティング用のヒント
+troubleshooting:
+  title: "ヒント"                                                      # ヒントセクションのタイトル
+  api_key_check: "APIキーが正しく設定されているか確認してください"              # APIキー確認
+  target_url_check: "アクセス先URLが正しく設定されているか確認してください"       # アクセス先URL確認
+  login_credentials: "勤怠管理システムのログイン情報が正しいか確認してください"    # ログイン情報確認
+  internet_check: "インターネット接続を確認してください"                    # ネット接続確認
+  browser_check: "Chromiumブラウザが正しくインストールされているか確認してください"  # ブラウザ確認
+
+# プログラムヘッダー表示設定
+headers:
+  program_title: "勤怠管理システム 自動確認プログラム"  # プログラムタイトル
+  separator_length: 60                              # 区切り線の長さ（=記号の数）

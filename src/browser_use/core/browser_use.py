@@ -27,6 +27,7 @@ class BrowserUseTest:
     def __init__(self):
         self.models_config = None
         self.prompts_config = None
+        self.messages_config = None
         self.llm = None
         self.selected_model = None
 
@@ -51,8 +52,9 @@ class BrowserUseTest:
         """
         self.models_config = self.load_yaml_config('modes_setting.yaml')
         self.prompts_config = self.load_yaml_config('prompt.yaml')
+        self.messages_config = self.load_yaml_config('app_messages.yaml')
 
-        if not self.models_config or not self.prompts_config:
+        if not self.models_config or not self.prompts_config or not self.messages_config:
             print("設定ファイルの読み込みに失敗しました")
             return False
         return True
@@ -105,7 +107,7 @@ class BrowserUseTest:
         return False
 
     def show_api_key_error(self):
-        errors = self.prompts_config.get('errors', {})
+        errors = self.messages_config.get('errors', {})
         print(errors.get('no_api_key', 'APIキーが設定されていません'))
         print(errors.get('env_setup_instruction', '設定を確認してください'))
 
@@ -116,8 +118,8 @@ class BrowserUseTest:
             print(f"   - {api_key_env}")
 
     def show_header(self):
-        if self.prompts_config:
-            headers = self.prompts_config.get('headers', {})
+        if self.messages_config:
+            headers = self.messages_config.get('headers', {})
             separator_length = headers.get('separator_length', 60)
             program_title = headers.get('program_title', 'Browser-use テストプログラム')
 
@@ -125,24 +127,57 @@ class BrowserUseTest:
             print(program_title)
             print("=" * separator_length)
 
+    def get_task_with_env_variables(self):
+        """
+        環境変数を使用してタスクテンプレートを展開
+        """
+        # TARGET_URLを環境変数から取得
+        target_url = os.getenv('TARGET_URL')
+
+        if target_url:
+            # テンプレートがある場合は環境変数で展開
+            task_template = self.prompts_config.get('attendance_task_template')
+            if task_template:
+                return task_template.format(target_url=target_url)
+
+        # デフォルトタスクを使用
+        return self.prompts_config.get('default_task', 'デフォルトタスク')
+
+    def check_required_env_variables(self):
+        """
+        必要な環境変数の確認
+        """
+        target_url = os.getenv('TARGET_URL') or os.getenv('JOBCAN_URL')
+        if not target_url:
+            errors = self.messages_config.get('errors', {})
+            print(errors.get('no_target_url', 'アクセス先URLが設定されていません'))
+            print(errors.get('env_setup_instruction', '.envファイルに設定を行ってください'))
+            print(errors.get('target_url_instruction', 'TARGET_URL=your_url_here'))
+            return False
+        return True
+
     async def run_agent(self):
-        messages = self.prompts_config.get('messages', {})
-        troubleshooting = self.prompts_config.get('troubleshooting', {})
+        messages = self.messages_config.get('messages', {})
+        troubleshooting = self.messages_config.get('troubleshooting', {})
 
         print(messages.get('start', 'テストを開始します'))
         print(f"利用可能なLLM: {self.selected_model}")
 
+        # 環境変数チェック
+        if not self.check_required_env_variables():
+            return
+
         try:
-            # プロンプトから取得したタスクでエージェントを作成
-            default_task = self.prompts_config.get('prompts', {}).get('default_task', 'デフォルトタスク')
+            # 環境変数を使用してタスクを取得
+            task = self.get_task_with_env_variables()
 
             agent = Agent(
-                task=default_task,
+                task=task,
                 llm=self.llm,
             )
 
             print(messages.get('agent_start', 'エージェントを開始します'))
-            print(messages.get('task_description', f'タスク: {default_task}'))
+            print(messages.get('task_description', f'タスク: 指定されたURLにアクセスして勤怠情報を確認する'))
 
             # エージェントを実行
             result = await agent.run()
@@ -154,6 +189,7 @@ class BrowserUseTest:
             print(f"{messages.get('error_occurred', 'エラーが発生しました')}: {e}")
             print(troubleshooting.get('title', 'ヒント'))
             print(f"   - {troubleshooting.get('api_key_check', 'APIキーを確認してください')}")
+            print(f"   - {troubleshooting.get('target_url_check', 'アクセス先URLを確認してください')}")
             print(f"   - {troubleshooting.get('internet_check', 'インターネット接続を確認してください')}")
             print(f"   - {troubleshooting.get('browser_check', 'ブラウザの確認をしてください')}")
 

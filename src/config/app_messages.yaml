@@ -19,6 +19,7 @@ messages:
 errors:
   no_api_key: "エラー: APIキーが設定されていません"                          # APIキー未設定エラー
   no_target_url: "エラー: アクセス先URLが設定されていません"                 # アクセス先URL未設定エラー
+  missing_env_vars: "エラー: 以下の環境変数が設定されていません"              # 複数環境変数未設定エラー
   env_setup_instruction: ".envファイルに以下の設定を行ってください"             # 設定方法の案内
   target_url_instruction: "TARGET_URL=https://your-attendance-system.com/ (勤怠管理システムのURL)"  # アクセス先URL設定案内
 

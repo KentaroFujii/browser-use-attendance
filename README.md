@@ -33,6 +33,11 @@ uv run playwright install chromium --with-deps --no-shell
 # 勤怠管理システムのURL（必須）
 TARGET_URL=https://your-attendance-system.com/
 
+# ログイン情報（必須）
+LOGIN_EMAIL=your-email@example.com
+LOGIN_PASSWORD=your-password
+EXPECTED_NAME=期待するユーザー名
+
 # OpenAI APIキー（推奨）
 OPENAI_API_KEY=your_openai_api_key_here
 # または以下のいずれか
@@ -42,6 +47,7 @@ GOOGLE_API_KEY=your_google_api_key_here
 
 注意:
 - `TARGET_URL`には使用する勤怠管理システムのURLを設定してください
+- `LOGIN_EMAIL`、`LOGIN_PASSWORD`、`EXPECTED_NAME`はセキュリティのため必ず.envファイルに設定してください
 
 ## 実行方法
 ### 勤怠管理システム確認の実行

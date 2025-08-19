@@ -130,14 +130,22 @@ class AttendanceAgent:
         """
         環境変数を使用してタスクテンプレートを展開
         """
-        # TARGET_URLを環境変数から取得
+        # 必要な環境変数を取得
         target_url = os.getenv('TARGET_URL')
+        login_email = os.getenv('LOGIN_EMAIL')
+        login_password = os.getenv('LOGIN_PASSWORD')
+        expected_name = os.getenv('EXPECTED_NAME')
 
         if target_url:
             # テンプレートがある場合は環境変数で展開
             task_template = self.prompts_config.get('attendance_task_template')
             if task_template:
-                return task_template.format(target_url=target_url)
+                return task_template.format(
+                    target_url=target_url,
+                    login_email=login_email or '[メールアドレスが設定されていません]',
+                    login_password=login_password or '[パスワードが設定されていません]',
+                    expected_name=expected_name or '[期待する名前が設定されていません]'
+                )
 
         # デフォルトタスクを使用
         return self.prompts_config.get('default_task', 'デフォルトタスク')
@@ -146,13 +154,37 @@ class AttendanceAgent:
         """
         必要な環境変数の確認
         """
+        errors = self.messages_config.get('errors', {})
+        missing_vars = []
+
+        # 必須環境変数のチェック
         target_url = os.getenv('TARGET_URL') or os.getenv('JOBCAN_URL')
         if not target_url:
-            errors = self.messages_config.get('errors', {})
-            print(errors.get('no_target_url', 'アクセス先URLが設定されていません'))
-            print(errors.get('env_setup_instruction', '.envファイルに設定を行ってください'))
-            print(errors.get('target_url_instruction', 'TARGET_URL=your_url_here'))
+            missing_vars.append('TARGET_URL')
+
+        login_email = os.getenv('LOGIN_EMAIL')
+        if not login_email:
+            missing_vars.append('LOGIN_EMAIL')
+
+        login_password = os.getenv('LOGIN_PASSWORD')
+        if not login_password:
+            missing_vars.append('LOGIN_PASSWORD')
+
+        expected_name = os.getenv('EXPECTED_NAME')
+        if not expected_name:
+            missing_vars.append('EXPECTED_NAME')
+
+        if missing_vars:
+            print(errors.get('missing_env_vars', '以下の環境変数が設定されていません:'))
+            for var in missing_vars:
+                print(f"  - {var}")
+            print(errors.get('env_setup_instruction', '.envファイルに以下の設定を行ってください:'))
+            print("TARGET_URL=https://your-attendance-system-url")
+            print("LOGIN_EMAIL=your-email@example.com")
+            print("LOGIN_PASSWORD=your-password")
+            print("EXPECTED_NAME=期待するユーザー名")
             return False
+
         return True
 
     async def run_agent(self):

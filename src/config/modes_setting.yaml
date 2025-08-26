@@ -5,7 +5,7 @@ models:
   # OpenAI設定
   openai:
     enabled: true                    # このモデルを有効にするかどうか
-    model: "gpt-4o-mini"            # 使用するOpenAIモデル名（gpt-4、gpt-3.5-turbo等）
+    model: "gpt-5"            # 使用するOpenAIモデル名（gpt-4、gpt-3.5-turbo等）
     temperature: 0.7                 # モデルの創造性（0.0-2.0、低いほど一貫性重視）
     api_key_env: "OPENAI_API_KEY"   # APIキーの環境変数名
 

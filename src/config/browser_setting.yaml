@@ -1,0 +1,34 @@
+# ブラウザ設定ファイル
+# browser-useライブラリのBrowserConfigに関する設定を管理
+
+browser:
+  # 基本設定
+  headless: false                    # ヘッドレスモード（true: 非表示、false: ブラウザ表示）
+  chrome_instance_path: null       # Chromeの実行パスを指定（nullの場合は自動検出）
+  save_recording_path: ./tmp/my_recording  # 録画データの保存パスを指定（nullの場合は保存しない）
+
+  # デバッグ・開発設定
+  debug: false                      # デバッグモード
+  persist_browser_session: True   # ブラウザセッションを維持するか
+
+  # パフォーマンス設定
+  window_width: 1920               # ブラウザウィンドウの幅
+  window_height: 1080              # ブラウザウィンドウの高さ
+
+  # ネットワーク設定
+  timeout: 30                      # ページ読み込みタイムアウト（秒）
+
+  # 詳細設定
+  extra_chromium_args: []          # 追加のChromiumコマンドライン引数
+
+# プロンプト設定選択
+prompt_selection:
+  # 使用するプロンプトテンプレート名を指定
+  # prompt.yamlから該当するテンプレートを選択
+  task_template: "meta_attendance_task_template"  # デフォルト使用テンプレート
+
+# 利用可能なテンプレート一覧（参考用）
+# available_templates:
+#   - "meta_attendance_task_template"        # 自律エージェント型（抽象的）
+#   - "jobcan_attendance_task_template"      # ジョブカン特化型（具体的手順）
+#   - "detail_jobcan_attendance_task_template"  # 詳細手順型

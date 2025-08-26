@@ -11,3 +11,7 @@ wheels/
 
 # Environment variables
 .env
+
+# 録画データ
+tmp/
+tmp/my_recording/

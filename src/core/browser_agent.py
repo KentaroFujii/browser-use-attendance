@@ -3,9 +3,13 @@
 YAML設定からLLMモデルとプロンプトを読み込み、エージェントを実行する
 """
 import os
-import yaml
+import yaml  # type: ignore
+import time
+from datetime import datetime
 from pathlib import Path
 from browser_use import Agent
+from browser_use import Browser
+from browser_use import BrowserConfig
 # LLMモデルのインポート
 from browser_use import ChatOpenAI
 from langchain_anthropic import ChatAnthropic
@@ -21,8 +25,11 @@ class AttendanceAgent:
         self.models_config = None
         self.prompts_config = None
         self.messages_config = None
+        self.browser_config = None
         self.llm = None
         self.selected_model = None
+        self.start_time = None
+        self.end_time = None
 
     def load_yaml_config(self, filename):
         """
@@ -46,8 +53,9 @@ class AttendanceAgent:
         self.models_config = self.load_yaml_config('modes_setting.yaml')
         self.prompts_config = self.load_yaml_config('prompt.yaml')
         self.messages_config = self.load_yaml_config('app_messages.yaml')
+        self.browser_config = self.load_yaml_config('browser_setting.yaml')
 
-        if not self.models_config or not self.prompts_config or not self.messages_config:
+        if not self.models_config or not self.prompts_config or not self.messages_config or not self.browser_config:
             print("設定ファイルの読み込みに失敗しました")
             return False
         return True
@@ -94,7 +102,7 @@ class AttendanceAgent:
 
             except ImportError as e:
                 print(f"{model_name}のライブラリが見つかりません: {e}")
-                print(f"pip install が必要な可能性があります")
+                print("pip install が必要な可能性があります")
                 continue
 
         return False
@@ -126,6 +134,34 @@ class AttendanceAgent:
             print(program_title)
             print("=" * separator_length)
 
+    def log_execution_time(self, message: str, show_elapsed: bool = False):
+        """
+        実行時間をログ出力
+        """
+        current_time = datetime.now()
+        timestamp = current_time.strftime("%Y-%m-%d %H:%M:%S")
+
+        if show_elapsed and self.start_time:
+            elapsed = time.time() - self.start_time
+            print(f"[{timestamp}] {message} (経過時間: {elapsed:.2f}秒)")
+        else:
+            print(f"[{timestamp}] {message}")
+
+    def format_duration(self, duration_seconds: float) -> str:
+        """
+        秒数を時分秒形式にフォーマット
+        """
+        hours = int(duration_seconds // 3600)
+        minutes = int((duration_seconds % 3600) // 60)
+        seconds = duration_seconds % 60
+
+        if hours > 0:
+            return f"{hours}時間{minutes}分{seconds:.2f}秒"
+        elif minutes > 0:
+            return f"{minutes}分{seconds:.2f}秒"
+        else:
+            return f"{seconds:.2f}秒"
+
     def get_task_with_env_variables(self):
         """
         環境変数を使用してタスクテンプレートを展開
@@ -137,8 +173,12 @@ class AttendanceAgent:
         expected_name = os.getenv('EXPECTED_NAME')
 
         if target_url:
-            # テンプレートがある場合は環境変数で展開
-            task_template = self.prompts_config.get('attendance_task_template')
+            # browser_setting.yamlからテンプレート名を取得
+            prompt_selection = self.browser_config.get('prompt_selection', {})
+            template_name = prompt_selection.get('task_template', 'meta_attendance_task_template')
+
+            # 指定されたテンプレートを取得
+            task_template = self.prompts_config.get(template_name)
             if task_template:
                 return task_template.format(
                     target_url=target_url,
@@ -194,32 +234,71 @@ class AttendanceAgent:
         messages = self.messages_config.get('messages', {})
         troubleshooting = self.messages_config.get('troubleshooting', {})
 
-        print(messages.get('start', 'テストを開始します'))
+        # エージェント実行開始ログ
+        self.log_execution_time(messages.get('start', 'テストを開始します'))
         print(f"利用可能なLLM: {self.selected_model}")
+
+        # 設定情報をログ出力
+        browser_settings = self.browser_config.get('browser', {})
+        prompt_selection = self.browser_config.get('prompt_selection', {})
+        print(f"ブラウザモード: {'ヘッドレス' if browser_settings.get('headless', True) else '表示'}")
+        print(f"使用プロンプト: {prompt_selection.get('task_template', 'meta_attendance_task_template')}")
 
         # 環境変数チェック
         if not self.check_required_env_variables():
+            self.log_execution_time("環境変数チェック失敗により終了")
             return
 
         try:
             # 環境変数を使用してタスクを取得
             task = self.get_task_with_env_variables()
 
+            # エージェント実行開始時刻を記録
+            self.start_time = time.time()
+            self.log_execution_time("エージェント実行開始")
+
+
+            # browser_setting.yamlからブラウザ設定を取得
+            browser_settings = self.browser_config.get('browser', {})
+
+            browser = Browser(
+                config=BrowserConfig(
+                    headless=browser_settings.get('headless', True),
+                    disable_security=browser_settings.get('disable_security', False),
+                    chrome_instance_path=browser_settings.get('chrome_instance_path'),
+                    save_recording_path=browser_settings.get('save_recording_path'),
+                )
+            )
+
             agent = Agent(
                 task=task,
                 llm=self.llm,
+                browser=browser,
             )
 
-            print(messages.get('agent_start', 'エージェントを開始します'))
-            print(messages.get('task_description', f'タスク: 指定されたURLにアクセスして勤怠情報を確認する'))
+            self.log_execution_time(messages.get('agent_start', 'エージェントを開始します'), show_elapsed=True)
+            print(messages.get('task_description', 'タスク: 指定されたURLにアクセスして勤怠情報を確認する'))
 
             # エージェントを実行
             result = await agent.run()
 
-            print(messages.get('task_complete', 'タスクが完了しました'))
+            # 実行完了時刻を記録
+            self.end_time = time.time()
+            total_duration = self.end_time - self.start_time
+
+            self.log_execution_time(messages.get('task_complete', 'タスクが完了しました'))
+            self.log_execution_time(f"総実行時間: {self.format_duration(total_duration)}")
             print(f"結果: {result}")
 
         except Exception as e:
+            # エラー発生時も実行時間をログ
+            if self.start_time:
+                error_time = time.time()
+                error_duration = error_time - self.start_time
+                self.log_execution_time(f"エラー発生により終了 (実行時間: {self.format_duration(error_duration)})")
+            else:
+                self.log_execution_time("エラー発生により終了")
+
             print(f"{messages.get('error_occurred', 'エラーが発生しました')}: {e}")
             print(troubleshooting.get('title', 'ヒント'))
             print(f"   - {troubleshooting.get('api_key_check', 'APIキーを確認してください')}")
@@ -231,15 +310,34 @@ class AttendanceAgent:
         """
         エージェント実行のメインフロー
         """
+        # プログラム全体の開始時刻を記録
+        program_start_time = time.time()
+        start_datetime = datetime.now()
+
+        print(f"プログラム開始: {start_datetime.strftime('%Y-%m-%d %H:%M:%S')}")
+
         # 設定ファイル読み込み
         if not self.load_configs():
+            self.log_execution_time("設定ファイル読み込み失敗により終了")
             return
+
         # ヘッダー表示
         self.show_header()
+
         # LLMセットアップ
         if not self.setup_llm():
             self.show_api_key_error()
+            self.log_execution_time("LLMセットアップ失敗により終了")
             return
 
         # エージェント実行
         await self.run_agent()
+
+        # プログラム全体の終了時刻とログ
+        program_end_time = time.time()
+        end_datetime = datetime.now()
+        total_program_duration = program_end_time - program_start_time
+
+        print(f"プログラム終了: {end_datetime.strftime('%Y-%m-%d %H:%M:%S')}")
+        print(f"プログラム総実行時間: {self.format_duration(total_program_duration)}")
+        print("=" * 60)

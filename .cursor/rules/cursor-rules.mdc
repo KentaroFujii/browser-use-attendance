@@ -1,6 +1,40 @@
 ---
 alwaysApply: true
 ---
+# 技術スタック
+
+## フロントエンド
+- 言語：TypeScript
+- フレームワーク：React + Next.js
+- スタイリング：Styled-components
+- 状態管理：（未定義 - Redux、Zustand等を検討）
+- テスト：Jest
+- Linter/Formatter：ESLint + Prettier
+- パッケージマネージャー：pnpm
+
+## バックエンド
+- 言語：Python
+- フレームワーク：FastAPI
+- パッケージマネージャー：uv
+- Linter：Ruff
+- 型チェック：mypy
+- テスト：pytest
+
+## データベース
+- PostgreSQL
+
+## 開発環境・ツール
+- バージョン管理：Git
+- コンテナ：Docker
+- 環境変数管理：dotenv
+
+## API・通信
+- API形式：REST API（FastAPI）
+- （認証方式未定義）
+
+## デプロイ・インフラ
+- AWS
+
 # 回答時のルール
 - 絵文字を使用しない
 - 日本語で回答する。ただし、アルファベットの方がわかりやすいものはそのまま

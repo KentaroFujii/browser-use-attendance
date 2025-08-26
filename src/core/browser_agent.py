@@ -264,9 +264,7 @@ class AttendanceAgent:
             browser = Browser(
                 config=BrowserConfig(
                     headless=browser_settings.get('headless', True),
-                    disable_security=browser_settings.get('disable_security', False),
-                    chrome_instance_path=browser_settings.get('chrome_instance_path'),
-                    save_recording_path=browser_settings.get('save_recording_path'),
+                    save_recording_path=browser_settings.get('save_recording_path')
                 )
             )
 

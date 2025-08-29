@@ -15,3 +15,6 @@ wheels/
 # 録画データ
 tmp/
 tmp/my_recording/
+
+# macOS
+.DS_Store

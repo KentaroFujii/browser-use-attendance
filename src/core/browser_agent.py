@@ -8,8 +8,6 @@ import time
 from datetime import datetime
 from pathlib import Path
 from browser_use import Agent
-from browser_use import Browser
-from browser_use import BrowserConfig
 # LLMモデルのインポート
 from browser_use import ChatOpenAI
 from langchain_anthropic import ChatAnthropic
@@ -258,20 +256,9 @@ class AttendanceAgent:
             self.log_execution_time("エージェント実行開始")
 
 
-            # browser_setting.yamlからブラウザ設定を取得
-            browser_settings = self.browser_config.get('browser', {})
-
-            browser = Browser(
-                config=BrowserConfig(
-                    headless=browser_settings.get('headless', True),
-                    save_recording_path=browser_settings.get('save_recording_path')
-                )
-            )
-
             agent = Agent(
                 task=task,
-                llm=self.llm,
-                browser=browser,
+                llm=self.llm
             )
 
             self.log_execution_time(messages.get('agent_start', 'エージェントを開始します'), show_elapsed=True)
